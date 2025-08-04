@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Coches Amarillos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .login-screen {
+            display: block;
+        }
+
+        .main-app {
+            display: none;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .counter-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+        }
+
+        .counter-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .counter-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-remove {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .user-table {
+            margin: 1rem 0;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-row {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-row.current-user {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            font-weight: 600;
+        }
+
+        .user-position {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .user-position.gold {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .user-position.silver {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .user-position.bronze {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .user-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .user-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        .history-item.join {
+            border-left-color: #667eea;
+        }
+
+        .history-item.add {
+            border-left-color: #27ae60;
+        }
+
+        .history-item.remove {
+            border-left-color: #e74c3c;
+        }
+
+        .history-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .welcome {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Pantalla de Login -->
+        <div class="login-screen" id="loginScreen">
+            <div class="logo">🚗</div>
+            <h1>Contador de Coches Amarillos</h1>
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="Escribe tu nombre para empezar" maxlength="50">
+            </div>
+            <button class="btn" id="loginBtn" onclick="login()">Empezar a Contar</button>
+            <div id="loginError"></div>
+        </div>
+
+        <!-- Aplicación Principal -->
+        <div class="main-app" id="mainApp">
+            <div class="welcome" id="welcomeMessage"></div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('counter')">Contador</button>
+                <button class="tab" onclick="switchTab('history')">Historial</button>
+            </div>
+
+            <!-- Pestaña Contador -->
+            <div class="tab-content active" id="counterTab">
+                <div class="counter-display">
+                    <div class="counter-number" id="totalCount">0</div>
+                    <div>Coches Amarillos Totales</div>
+                </div>
+
+                <div class="counter-buttons">
+                    <button class="btn btn-add" id="addBtn" onclick="addCar()">➕ Añadir Coche</button>
+                    <button class="btn btn-remove" id="removeBtn" onclick="removeCar()">➖ Quitar Coche</button>
+                </div>
+
+                <div class="user-table">
+                    <h3 style="margin-bottom: 1rem; color: #333;">Ranking por Usuario</h3>
+                    <div class="table-container" id="userTable">
+                        <div class="loading">Cargando datos...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña Historial -->
+            <div class="tab-content" id="historyTab">
+                <h3 style="margin-bottom: 1rem; color: #333;">Historial de Cambios</h3>
+                <div class="history" id="historyList">
+                    <div class="loading">Cargando historial...</div>
+                </div>
+            </div>
+
+            <button class="btn logout-btn" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://raancaqzevvuvytvugdt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYW5jYXF6ZXZ2dXZ5dHZ1Z2R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyODU3NzYsImV4cCI6MjA2OTg2MTc3Nn0.AgjakOXClf5vlwK1DeUGgs9uwfPyrQB4r2q306hllWs';
+        
+        // Crear cliente de Supabase con configuración adicional
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: false
+            },
+            global: {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            },
+            realtime: {
+                params: {
+                    eventsPerSecond: 10
+                }
+            }
+        });
+
+        console.log('Supabase cliente inicializado');
+        console.log('URL:', SUPABASE_URL);
+        console.log('Cliente:', supabaseClient);
+
+        // Variables globales
+        let userData = {
+            name: '',
+            userId: null,
+            totalCount: 0,
+            userCounts: {}
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingUser();
+            document.getElementById('nameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
+
+        function checkExistingUser() {
+            // Intentar cargar datos existentes del localStorage
+            const savedName = localStorage.getItem('yellowCarUserName');
+            const savedExpiry = localStorage.getItem('yellowCarExpiry');
+            
+            if (savedName && savedExpiry) {
+                const now = new Date().getTime();
+                const expiryTime = parseInt(savedExpiry);
+                
+                // Verificar si los datos no han expirado (30 días)
+                if (now < expiryTime) {
+                    document.getElementById('nameInput').value = savedName;
+                    login();
+                    return;
+                } else {
+                    // Datos expirados, limpiar
+                    localStorage.removeItem('yellowCarUserName');
+                    localStorage.removeItem('yellowCarExpiry');
+                }
+            }
+        }
+
+        function saveUserToLocal(name) {
+            const expiryTime = new Date().getTime() + (30 * 24 * 60 * 60 * 1000); // 30 días
+            localStorage.setItem('yellowCarUserName', name);
+            localStorage.setItem('yellowCarExpiry', expiryTime.toString());
+        }
+
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => {
+                errorDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function setButtonsLoading(loading) {
+            const loginBtn = document.getElementById('loginBtn');
+            const addBtn = document.getElementById('addBtn');
+            const removeBtn = document.getElementById('removeBtn');
+            
+            if (loginBtn) loginBtn.disabled = loading;
+            if (addBtn) addBtn.disabled = loading;
+            if (removeBtn) removeBtn.disabled = loading;
+        }
+
+        async function login() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                alert('Por favor, escribe tu nombre');
+                return;
+            }
+
+            setButtonsLoading(true);
+
+            try {
+                console.log('Intentando conectar con Supabase...');
+                console.log('URL:', SUPABASE_URL);
+                
+                // Test de conexión básica - simplificado
+                const { data: testData, error: testError } = await supabaseClient
+                    .from('users')
+                    .select('id')
+                    .limit(1);
+
+                if (testError) {
+                    console.error('Error de conexión:', testError);
+                    throw new Error(`Error de conexión a la base de datos: ${testError.message}`);
+                }
+
+                console.log('Conexión exitosa, buscando usuario...');
+
+                // Buscar o crear usuario
+                let { data: existingUser, error: selectError } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('name', name)
+                    .maybeSingle(); // Cambiado de single() a maybeSingle()
+
+                console.log('Resultado búsqueda usuario:', { existingUser, selectError });
+
+                let userId;
+
+                if (!existingUser && !selectError) {
+                    // Usuario no existe, crear uno nuevo
+                    console.log('Creando nuevo usuario...');
+                    const { data: newUser, error: insertError } = await supabaseClient
+                        .from('users')
+                        .insert({ name })
+                        .select()
+                        .single();
+
+                    if (insertError) {
+                        console.error('Error insertando usuario:', insertError);
+                        throw new Error('Error creando usuario: ' + insertError.message);
+                    }
+
+                    console.log('Usuario creado:', newUser);
+                    userId = newUser.id;
+
+                    // Crear entrada en counts
+                    const { error: countError } = await supabaseClient
+                        .from('counts')
+                        .insert({ user_id: userId, count: 0 });
+
+                    if (countError) {
+                        console.error('Error creando contador:', countError);
+                        throw new Error('Error inicializando contador: ' + countError.message);
+                    }
+
+                    console.log('Contador inicializado');
+                } else if (selectError) {
+                    console.error('Error consultando usuario:', selectError);
+                    throw new Error('Error consultando usuario: ' + selectError.message);
+                } else {
+                    console.log('Usuario existente encontrado:', existingUser);
+                    userId = existingUser.id;
+                }
+
+                userData.name = name;
+                userData.userId = userId;
+
+                // Guardar en localStorage
+                saveUserToLocal(name);
+
+                // Mostrar aplicación
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('welcomeMessage').textContent = `¡Hola, ${name}! 👋`;
+
+                // Cargar datos
+                console.log('Cargando datos...');
+                await loadDataFromSupabase();
+                await loadHistoryFromSupabase();
+                await addToHistory(`${name} se ha unido al contador`, 'join');
+                console.log('Login completado exitosamente');
+
+            } catch (error) {
+                console.error('Error completo en login:', error);
+                let errorMessage = 'Error desconocido';
+                
+                if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+                    errorMessage = 'Error de red. Verifica tu conexión a internet y que la URL de Supabase sea correcta.';
+                } else if (error.message.includes('Invalid API key')) {
+                    errorMessage = 'Clave de API inválida. Verifica tu SUPABASE_ANON_KEY.';
+                } else if (error.message.includes('relation') && error.message.includes('does not exist')) {
+                    errorMessage = 'Las tablas no existen en la base de datos. Verifica que hayas creado las tablas users, counts e history.';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                showError('loginError', errorMessage);
+            } finally {
+                setButtonsLoading(false);
+            }
+        }
+
+        async function loadDataFromSupabase() {
+            try {
+                const { data: counts, error } = await supabaseClient
+                    .from('counts')
+                    .select(`
+                        count,
+                        user_id,
+                        users (name)
+                    `)
+                    .order('count', { ascending: false });
+
+                if (error) {
+                    throw new Error('Error cargando datos: ' + error.message);
+                }
+
+                userData.userCounts = {};
+                userData.totalCount = 0;
+
+                counts.forEach(row => {
+                    const name = row.users.name;
+                    userData.userCounts[name] = row.count;
+                    userData.totalCount += row.count;
+                });
+
+                updateDisplay();
+
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('userTable').innerHTML = `<div class="error">${error.message}</div>`;
+            }
+        }
+
+        async function loadHistoryFromSupabase() {
+            try {
+                const { data: historyItems, error } = await supabaseClient
+                    .from('history')
+                    .select('message, created_at, action_type')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) {
+                    throw new Error('Error cargando historial: ' + error.message);
+                }
+
+                const historyList = document.getElementById('historyList');
+                historyList.innerHTML = '';
+
+                if (historyItems.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="history-item join">
+                            <div>¡Bienvenido! El contador está listo para usar.</div>
+                            <div class="history-time">Ahora</div>
+                        </div>
+                    `;
+                } else {
+                    historyItems.forEach(item => {
+                        const historyDiv = document.createElement('div');
+                        const actionClass = item.action_type || 'join';
+                        historyDiv.className = `history-item ${actionClass}`;
+                        const time = new Date(item.created_at).toLocaleTimeString('es-ES', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        });
+                        historyDiv.innerHTML = `
+                            <div>${item.message}</div>
+                            <div class="history-time">${time}</div>
+                        `;
+                        historyList.appendChild(historyDiv);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+                document.getElementById('historyList').innerHTML = `<div class="error">${error.message}</div>`;
+            }
+        }
+
+        function logout() {
+            // Limpiar datos guardados
+            localStorage.removeItem('yellowCarUserName');
+            localStorage.removeItem('yellowCarExpiry');
+            
+            // Resetear datos en memoria
+            userData = {
+                name: '',
+                userId: null,
+                totalCount: 0,
+                userCounts: {}
+            };
+            
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('nameInput').value = '';
+            switchTab('counter');
+        }
+
+        function switchTab(tabName) {
+            // Remover clase active de todas las tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activar tab seleccionada
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        async function addCar() {
+            if (!userData.userId) return;
+
+            setButtonsLoading(true);
+
+            try {
+                const newCount = (userData.userCounts[userData.name] || 0) + 1;
+
+                const { error } = await supabaseClient
+                    .from('counts')
+                    .update({ count: newCount })
+                    .eq('user_id', userData.userId);
+
+                if (error) {
+                    throw new Error('Error actualizando contador: ' + error.message);
+                }
+
+                // Añadir al historial
+                await addToHistory(`${userData.name} ha añadido un coche amarillo`, 'add');
+
+                // Recargar datos
+                await loadDataFromSupabase();
+
+            } catch (error) {
+                console.error('Error añadiendo coche:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                setButtonsLoading(false);
+            }
+        }
+
+        async function removeCar() {
+            if (!userData.userId) return;
+
+            const currentCount = userData.userCounts[userData.name] || 0;
+            if (currentCount <= 0) {
+                alert('No puedes quitar más coches');
+                return;
+            }
+
+            setButtonsLoading(true);
+
+            try {
+                const newCount = currentCount - 1;
+
+                const { error } = await supabaseClient
+                    .from('counts')
+                    .update({ count: newCount })
+                    .eq('user_id', userData.userId);
+
+                if (error) {
+                    throw new Error('Error actualizando contador: ' + error.message);
+                }
+
+                // Añadir al historial
+                await addToHistory(`${userData.name} ha quitado un coche amarillo`, 'remove');
+
+                // Recargar datos
+                await loadDataFromSupabase();
+
+            } catch (error) {
+                console.error('Error quitando coche:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                setButtonsLoading(false);
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('totalCount').textContent = userData.totalCount;
+            updateUserTable();
+        }
+
+        function updateUserTable() {
+            const tableContainer = document.getElementById('userTable');
+            
+            // Convertir objeto de usuarios a array y ordenar por cantidad
+            const usersArray = Object.entries(userData.userCounts)
+                .map(([name, count]) => ({ name, count }))
+                .sort((a, b) => b.count - a.count);
+
+            // Si no hay usuarios, mostrar mensaje
+            if (usersArray.length === 0) {
+                tableContainer.innerHTML = `
+                    <div class="table-row">
+                        <div class="user-info">
+                            <div class="user-name">No hay usuarios todavía</div>
+                            <div class="user-status">¡Sé el primero en contar coches!</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Generar HTML de la tabla
+            let tableHTML = '';
+            usersArray.forEach((user, index) => {
+                const position = index + 1;
+                const isCurrentUser = user.name === userData.name;
+                
+                let positionClass = '';
+                if (position === 1) positionClass = 'gold';
+                else if (position === 2) positionClass = 'silver';
+                else if (position === 3) positionClass = 'bronze';
+
+                const statusText = isCurrentUser ? '(Tú)' : 
+                    position === 1 ? '👑 Líder' : 
+                    `#${position}`;
+
+                tableHTML += `
+                    <div class="table-row ${isCurrentUser ? 'current-user' : ''}">
+                        <div class="user-position ${positionClass}">${position}</div>
+                        <div class="user-info">
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-status">${statusText}</div>
+                        </div>
+                        <div class="user-count">${user.count}</div>
+                    </div>
+                `;
+            });
+
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        async function addToHistory(message, actionType = 'join') {
+            try {
+                const { error } = await supabaseClient
+                    .from('history')
+                    .insert({ 
+                        user_id: userData.userId, 
+                        message: message,
+                        action_type: actionType
+                    });
+
+                if (error) {
+                    throw new Error('Error guardando historial: ' + error.message);
+                }
+
+                // Recargar historial
+                await loadHistoryFromSupabase();
+
+            } catch (error) {
+                console.error('Error en historial:', error);
+            }
+        }
+    </script>
+</body>
+</html>
