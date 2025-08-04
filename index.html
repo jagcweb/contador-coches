@@ -487,6 +487,7 @@
                 let userId;
 
                 if (!existingUser && !selectError) {
+                    await addToHistory(`${name} se ha unido al contador`, 'join');
                     // Usuario no existe, crear uno nuevo
                     console.log('Creando nuevo usuario...');
                     const { data: newUser, error: insertError } = await supabaseClient
@@ -537,7 +538,6 @@
                 console.log('Cargando datos...');
                 await loadDataFromSupabase();
                 await loadHistoryFromSupabase();
-                await addToHistory(`${name} se ha unido al contador`, 'join');
                 console.log('Login completado exitosamente');
 
             } catch (error) {
